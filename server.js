@@ -1,49 +1,45 @@
-// server.js
+// server.js -> UPDATED FOR GEMINI API
+
 const express = require('express');
-const axios =require('axios');
+const axios = require('axios');
 const cors = require('cors');
-const path = require('path'); // Import the 'path' module
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Enable CORS for API requests
+app.use(cors());
 app.use(express.json());
-
-// --- Serve Frontend Files ---
-// This tells Express to serve your index.html and script.js from the 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- API Key and Configuration ---
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+// We will now use the Gemini API Key
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const QURAN_API_URL = 'https://api.quran.com/api/v4/';
-const AI_MODEL = 'deepseek-chat';
 
-if (!DEEPSEEK_API_KEY) {
-  console.error("CRITICAL ERROR: DEEPSEEK_API_KEY environment variable not found.");
+if (!GEMINI_API_KEY) {
+  console.error("CRITICAL ERROR: GEMINI_API_KEY environment variable not found.");
 }
 
-// --- API Endpoint ---
-// Your frontend will make requests to this single endpoint
+// --- API Endpoint (No changes here) ---
 app.post('/api/get-verse', async (req, res) => {
+    // This entire section remains the same
   const { userInput } = req.body;
 
   if (!userInput) {
     return res.status(400).json({ error: 'User input is required.' });
   }
-  if (!DEEPSEEK_API_KEY) {
+  if (!GEMINI_API_KEY) {
     return res.status(500).json({ error: 'The server is missing its API key.' });
   }
 
   try {
-    // Step 1: Analyze emotion with DeepSeek
     const emotionPrompt = `Analyze this text and respond with one of: happy, sad, anxious, fearful, angry, confused, grateful, hopeful, lonely, stressed.\nText: "${userInput}"`;
     const emotionResponse = await callAI(emotionPrompt);
-    const emotion = emotionResponse.toLowerCase().trim().replace('.', '');
+    const emotion = emotionResponse.toLowerCase().trim().replace(/['."]/g, ''); // More robust cleaning
 
-    // Step 2: Find a relevant verse from Quran.com
     const topics = {
       happy: 'joy', sad: 'comfort', anxious: 'trust', fearful: 'protection',
       angry: 'forgiveness', confused: 'guidance', grateful: 'thanks',
@@ -63,11 +59,9 @@ app.post('/api/get-verse', async (req, res) => {
       reference: `Surah ${v.chapter.name_simple}, Ayah ${v.verse_number}`
     };
 
-    // Step 3: Generate a reflection for the verse
     const reflectionPrompt = `Give a short, comforting, 2-sentence Islamic reflection on this verse, considering the user is feeling ${emotion}.\nVerse: ${verseData.english} (${verseData.reference})`;
     const reflection = await callAI(reflectionPrompt);
 
-    // Step 4: Send the complete data back to the frontend
     res.json({ ...verseData, reflection, emotion });
 
   } catch (error) {
@@ -76,18 +70,28 @@ app.post('/api/get-verse', async (req, res) => {
   }
 });
 
-// Helper function to call the DeepSeek API
+
+// --- callAI function (UPDATED FOR GEMINI) ---
 async function callAI(prompt) {
-  const response = await axios.post(
-    'https://api.deepseek.com/v1/chat/completions',
-    { model: AI_MODEL, messages: [{ role: 'user', content: prompt }], temperature: 0.7, max_tokens: 200 },
-    { headers: { 'Authorization': `Bearer ${DEEPSEEK_API_KEY}`, 'Content-Type': 'application/json' } }
-  );
-  return response.data.choices[0].message.content;
+  // The Gemini API endpoint is different
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+
+  // The request body format is also different
+  const requestBody = {
+    contents: [{
+      parts: [{
+        text: prompt
+      }]
+    }]
+  };
+
+  const response = await axios.post(API_URL, requestBody);
+  // The way we get the text from the response is different
+  return response.data.candidates[0].content.parts[0].text;
 }
 
 
-// --- Start Server ---
+// --- Start Server (No changes here) ---
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
