@@ -1,4 +1,4 @@
-// server.js -> UPDATED FOR GEMINI API
+// server.js -> FINAL VERSION with correct Gemini model name
 
 const express = require('express');
 const axios = require('axios');
@@ -15,7 +15,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- API Key and Configuration ---
-// We will now use the Gemini API Key
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const QURAN_API_URL = 'https://api.quran.com/api/v4/';
 
@@ -38,7 +37,7 @@ app.post('/api/get-verse', async (req, res) => {
   try {
     const emotionPrompt = `Analyze this text and respond with one of: happy, sad, anxious, fearful, angry, confused, grateful, hopeful, lonely, stressed.\nText: "${userInput}"`;
     const emotionResponse = await callAI(emotionPrompt);
-    const emotion = emotionResponse.toLowerCase().trim().replace(/['."]/g, ''); // More robust cleaning
+    const emotion = emotionResponse.toLowerCase().trim().replace(/['."]/g, '');
 
     const topics = {
       happy: 'joy', sad: 'comfort', anxious: 'trust', fearful: 'protection',
@@ -71,12 +70,11 @@ app.post('/api/get-verse', async (req, res) => {
 });
 
 
-// --- callAI function (UPDATED FOR GEMINI) ---
+// --- callAI function (UPDATED MODEL NAME) ---
 async function callAI(prompt) {
-  // The Gemini API endpoint is different
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+  // CORRECTED: The model is 'gemini-pro', not 'gemini-1.0-pro'
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
 
-  // The request body format is also different
   const requestBody = {
     contents: [{
       parts: [{
@@ -86,7 +84,6 @@ async function callAI(prompt) {
   };
 
   const response = await axios.post(API_URL, requestBody);
-  // The way we get the text from the response is different
   return response.data.candidates[0].content.parts[0].text;
 }
 
