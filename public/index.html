@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qur'an Verse Jar ✧</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Inter:wght@400;600&family=Noto+Sans+Bengali&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    .font-arabic { font-family: 'Amiri', serif; }
+    .font-english { font-family: 'Inter', sans-serif; }
+    .font-bengali { font-family: 'Noto Sans Bengali', sans-serif; }
+    .error-message { color: #ef4444; } /* red-500 */
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-indigo-100 to-blue-200 dark:from-gray-900 dark:to-gray-800 font-english min-h-screen flex flex-col">
+  <div class="container mx-auto px-4 py-6">
+    <header class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Qur'an Verse Jar 🏺</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-300">AI-powered guidance from the Qur'an</p>
+      </div>
+      <button id="theme-toggle" class="text-gray-600 dark:text-gray-300 text-xl">
+        <i id="theme-icon" class="fas fa-moon"></i>
+      </button>
+    </header>
+
+    <main class="space-y-6">
+      <section class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+        <label class="block mb-4 text-lg font-semibold text-gray-700 dark:text-gray-200">What's on your heart today?</label>
+        <textarea id="user-input" class="w-full p-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200" rows="4" placeholder="I feel anxious about my exams..."></textarea>
+        <button id="get-verse-btn" class="mt-4 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all">
+          ✨ Get Verse
+        </button>
+      </section>
+
+      <div id="loading" class="hidden text-center text-gray-600 dark:text-gray-300">
+        <div class="animate-pulse">Analyzing your emotions and finding the perfect verse...</div>
+      </div>
+
+      <section id="verse-container" class="hidden bg-white dark:bg-gray-700 p-6 rounded-2xl shadow-xl space-y-4">
+        <div id="verse-content">
+          <div class="flex justify-between items-center">
+            <span id="emotion-indicator" class="text-sm px-3 py-1 rounded-full text-white bg-blue-500"></span>
+            <select id="translation-lang" class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-3 py-1 rounded">
+              <option value="english">English</option>
+              <option value="bengali">বাংলা (Bengali)</option>
+            </select>
+          </div>
+          <div class="text-center">
+            <p id="arabic-text" class="font-arabic text-3xl text-gray-900 dark:text-white"></p>
+            <p id="translation-text" class="mt-2 text-lg"></p>
+            <p id="reference-text" class="text-sm text-gray-500"></p>
+          </div>
+          <div>
+            <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200">Reflection:</h3>
+            <p id="reflection-text" class="text-gray-800 dark:text-gray-300"></p>
+          </div>
+        </div>
+        <div id="error-container" class="hidden text-center">
+            <p id="error-message" class="error-message font-semibold"></p>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button id="try-again-btn" class="bg-yellow-400 text-white px-4 py-2 rounded-xl">Try Again</button>
+          <button id="download-btn" class="bg-green-500 text-white px-4 py-2 rounded-xl">Download</button>
+          <button id="share-btn" class="bg-blue-500 text-white px-4 py-2 rounded-xl">Share</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p id="api-status">API: Ready</p>
+    </footer>
+  </div>
+
+  <script src="https://kit.fontawesome.com/a2d5dc02b3.js" crossorigin="anonymous"></script>
+  <script>
+    const config = {
+      backendUrl: '/api/get-verse' // Simplified URL will work on localhost and Render
+    };
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
