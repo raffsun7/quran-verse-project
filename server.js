@@ -1,4 +1,4 @@
-// server.js -> FINAL VERSION with correct Gemini model name
+// server.js -> FINAL VERSION v2 with correct 'gemini-1.5-flash-latest' model name
 
 const express = require('express');
 const axios = require('axios');
@@ -70,10 +70,10 @@ app.post('/api/get-verse', async (req, res) => {
 });
 
 
-// --- callAI function (UPDATED MODEL NAME) ---
+// --- callAI function (UPDATED MODEL NAME to gemini-1.5-flash-latest) ---
 async function callAI(prompt) {
-  // CORRECTED: The model is 'gemini-pro', not 'gemini-1.0-pro'
-  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
+  // CORRECTED: Using the latest free model from Google
+  const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
   const requestBody = {
     contents: [{
